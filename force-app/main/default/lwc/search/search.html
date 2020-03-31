@@ -1,0 +1,116 @@
+<template>
+    <lightning-card title="Search Accounts" icon-name="custom:custom78">
+      
+        <div>
+            <lightning-tabset>
+                <lightning-tab label="Account">
+                    <div class="slds-p-bottom_large slds-p-left_large" style="width:500px">
+                        <div if:true={errorMsg} style="margin-left: 3%;">
+                            <p style="color: red;">{errorMsg}</p>
+                        </div>
+                        <lightning-record-edit-form>
+                            <lightning-input label="Account Name" name="AccountName" type="text" onchange={handleField}></lightning-input>
+                            <lightning-input label="Email" name="email" type="email" onchange={handleField}></lightning-input>
+                            <lightning-input label="Record Type" name="recordType" type="text" onchange={handleField}></lightning-input>
+                            <lightning-input label="External Id" name="externalId" type="text" onchange={handleField}></lightning-input>
+                             <lightning-input type="checkbox" name="bussiness" label="Business Account" onchange={handleField}></lightning-input>
+                             <lightning-input type="checkbox" name="personal" label="Personal Account" onchange={handleField}></lightning-input>
+                            <br>
+                            <lightning-button type="submit"
+                                              name="submit"
+                                              label="Search"
+                                              onclick={displayAccount}>
+                                </lightning-button>  
+                            </lightning-record-edit-form>                                                             
+                        </div>
+                        <!--check result and display results in columns-->
+                        <div if:true={searchData}>
+                            <lightning-datatable data={searchData} 
+                                                 columns={columns} 
+                                                 key-field="id"
+                                                 hide-checkbox-column="true">
+                            </lightning-datatable>
+                        <!--data table of Account closed-->
+                        <template if:true={norecordfound}>
+                        --No Payments found--
+                        
+            
+                         </template>
+                        </div>
+                </lightning-tab>
+                    <!--Address Tab-->
+                <lightning-tab label="Address" title="2nd tab extended title">    
+                    <div class="slds-p-bottom_large slds-p-left_large" style="width:500px">
+                        <div if:true={errorMsg} style="margin-left: 3%;">
+                            <p style="color: red;">{errorMsg}</p>
+                        </div>
+                        <lightning-record-edit-form>
+                        
+                            <lightning-input label="Account Name" name="accnameAddress" type="text" onchange={handleFieldAdd}></lightning-input>
+                            <lightning-input label="Brick" name="addressBrick" type="text" onchange={handleFieldAdd}></lightning-input>
+                            <lightning-input label="Zip" name="addressZip" type="number" onchange={handleFieldAdd}></lightning-input>
+                            <lightning-input label="Country" name="addressCountry" type="text" onchange={handleFieldAdd}></lightning-input>
+                             <lightning-input type="checkbox" name="addressHCP" label="HCP Address" onchange={handleFieldAdd}></lightning-input>
+                             <lightning-input type="checkbox" name="addressHCO" label="HCO Address" onchange={handleFieldAdd}></lightning-input>
+                            <br>
+                            <lightning-button type="submit"
+                                              name="submit"
+                                              label="Search"
+                                              onclick={displayAddress}>
+                                </lightning-button>  
+                            </lightning-record-edit-form>                                                             
+                        </div>
+                        <!--check result and display results in columns-->
+                        <div if:true={searchAddData}>
+                            <lightning-datatable data={searchAddData} 
+                                                 columns={columnAdd} 
+                                                 key-field="id"
+                                                 hide-checkbox-column="true">
+                            </lightning-datatable>
+                        <!--data table of Account closed-->
+                        <template if:true={norecordfound}>
+                        --No Payments found--
+                        
+            
+                         </template>
+                        </div>
+                </lightning-tab>
+                <lightning-tab label="Account Relationships">
+                    <!--Three Content !--> 
+                    <div class ="slds-m-around_medium">
+                         <!-- <lightning-input type="search" onchange={findAccountResult} label="Search"  class="slds-m-bottom_small"></lightning-input>
+                      <lightning-datatable key-field="Id" data={RelationshipDetails} columns={columnListRelation} hide-checkbox-column="False" show-row-number-column="true">
+                        </lightning-datatable>
+                        <template if:true={norecordfound}>
+                            --No Payments found--
+            
+                        </template>-->
+                        <div class="slds-p-bottom_large slds-p-left_large" style="width:500px">
+                            <div if:true={errorMsg} style="margin-left: 3%;">
+                                <p style="color: red;">{errorMsg}</p>
+                            </div>
+                            <lightning-record-edit-form>
+                                
+                                <lightning-input label="From Account" name="accnameAddress" type="text" onchange={handleField}></lightning-input>
+                                <lightning-input label="To Account" name="addressBrick" type="text" onchange={handleField}></lightning-input>
+                                <br>
+                                <lightning-button type="submit"
+                                                  name="submit"
+                                                  label="Search"
+                                                  onclick={displayRealtionship}>
+                                    </lightning-button>  
+                                </lightning-record-edit-form>                                                             
+                            </div>
+                            <div class ="slds-m-around_medium">
+                            <lightning-datatable key-field="Id" columns={columnList} hide-checkbox-column="False" show-row-number-column="true">
+                            </lightning-datatable>
+                            </div>
+                   
+            
+                    </div>
+                    
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

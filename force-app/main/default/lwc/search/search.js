@@ -1,16 +1,21 @@
 import { LightningElement ,api, track } from 'lwc';
 import searchAccount from '@salesforce/apex/AccountList.searchAccount';
 import searchAddress from '@salesforce/apex/AccountList.searchAddress';
+import searchRelation from '@salesforce/apex/AccountList.searchRelation';
 
+//Table columns to display Accounts Details
 const columns = [
     {label: 'Id', fieldName: 'Id'},
     {label: 'Name', fieldName: 'Name'},
+    //,type: 'url',typeAttributes: {label:{fieldName:'Name'},target:'_blank'}},
     {label: 'Record Type', fieldName: 'RecordType.Name'},
     {label: 'Description', fieldName: 'Description'},
     {label: 'Account Number', fieldName: 'AccountNumber'},
     {label:'Email Id', fieldName:'Customer_Email__c'},
     {label:'Variant', fieldName:'Variant__c'},
 ];
+
+//Columns to display Address details
 const columnAdd =[
     {label: 'Id', fieldName: 'Id'},
     {label: 'Name', fieldName: 'Name'},
@@ -19,9 +24,21 @@ const columnAdd =[
     {label: 'Customer Address', fieldName: 'Customer_Address__c'},
 
 ];
-const AccountDetail=[];
-	
+const columnRelation=[
+    {label: 'ID', fieldName: 'nameUrl',
+    type: 'url',typeAttributes: {label:{fieldName:'accId'},target:'_blank'}},
+    {label:'Name',fieldName:'name'},
+    {label:'Record Type',fieldName:'recordType'},
+    //{label:'Account Name',fieldName:'Name' parenturlName},
+    {label:'Parent Account',fieldName:'parenturlName',
+    type: 'url',typeAttributes: {label:{fieldName:'parentAccName'},target:'_blank'}},
+    {label:'Parent Record Type',fieldName:'parentRecordType'},
+    {label:'Child Account',fieldName:'Child_account__c.name'},
+    {label:'Email',fieldName:'emailAccount'}
+];
+                   
 export default class Search extends LightningElement {
+    //Account Details
     @track searchData;
     @track columns = columns;
     @track errorMsg = '';
@@ -42,8 +59,12 @@ export default class Search extends LightningElement {
     strAddAccCountry = '';
     strAddAccHCP = true;
     strAddAccHCO = true;
-    
+    //relation data
+    @track searchRelationData;
+    @track columnRelation = columnRelation;
+    strAccNameRelation;
 
+    //Account Event Handler
     handleField(event) {
         this.strSearchAccName = event.detail.value;
         this.strSearchAccEmail = event.detail.value;
@@ -74,7 +95,7 @@ export default class Search extends LightningElement {
 
             }
     }
-    //Address Section
+    //Address event Handler 
 
     handleFieldAdd(event){
         this.strAddAccName = event.detail.value;
@@ -82,26 +103,7 @@ export default class Search extends LightningElement {
         this.strAddAccZip = event.detail.value;
         this.strAddAccCountry = event.detail.value;
         this.strAddAccHCP = event.detail.value;
-        this.strAddAccHCO = event.detail.value;
-
-       /* if (event.target.label === 'Account Name') {
-       
-        }
-        if (event.target.label === 'Brick') {
-         ;
-        }
-        if (event.target.label === 'Zip') {
-           
-        }
-        if (event.target.label === 'Country') {
-           
-        }
-        if (event.target.label === 'HCP Address') {
-            
-        }
-        if (event.target.label === 'HCP Address') {
-            
-        }*/
+        this.strAddAccHCO = event.detail.value;    
     }
     displayAddress() {
         if(((!this.strAddAccName || !this.strAddAccBrick)||(!this.strAddAccZip || !this.strAddAccCountry))|| ((!this.strAddAccHCP )|| (!this.strAddAccHCO))){
@@ -122,5 +124,29 @@ export default class Search extends LightningElement {
 
             }
     }
+
+    //Account Relaiton event Handler
+    handleFieldRelation(event){
+        this.strAccNameRelation = event.detail.value;
+    }
+    displayRealtionship(){
+        if(!this.strAccNameRelation){
+             this.errorMsg = "Please enter account detail to search";
+             this.searchRelationData = undefined;
+             return;
+         }
+        if(this.strAccNameRelation){
+            searchRelation({strAccNameRel:this.strAccNameRelation})
+            .then(result=>{
+                this.searchRelationData = result;
+                this.norecordfound = flase;
+            })
+        }else{
+            this.searchRelationData = false;
+            this.norecordfound = true;
+        }
+    }
+
+
     
 }

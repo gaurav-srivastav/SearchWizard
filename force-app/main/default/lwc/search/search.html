@@ -77,22 +77,17 @@
                 </lightning-tab>
                 <lightning-tab label="Account Relationships">
                     <!--Three Content !--> 
-                    <div class ="slds-m-around_medium">
-                         <!-- <lightning-input type="search" onchange={findAccountResult} label="Search"  class="slds-m-bottom_small"></lightning-input>
+                   <!-- <div class ="slds-m-around_medium">
+                         <lightning-input type="search" onchange={findAccountResult} label="Search"  class="slds-m-bottom_small"></lightning-input>
                       <lightning-datatable key-field="Id" data={RelationshipDetails} columns={columnListRelation} hide-checkbox-column="False" show-row-number-column="true">
-                        </lightning-datatable>
-                        <template if:true={norecordfound}>
-                            --No Payments found--
-            
-                        </template>-->
+                        </lightning-datatable>-->
                         <div class="slds-p-bottom_large slds-p-left_large" style="width:500px">
                             <div if:true={errorMsg} style="margin-left: 3%;">
                                 <p style="color: red;">{errorMsg}</p>
                             </div>
                             <lightning-record-edit-form>
                                 
-                                <lightning-input label="From Account" name="accnameAddress" type="text" onchange={handleField}></lightning-input>
-                                <lightning-input label="To Account" name="addressBrick" type="text" onchange={handleField}></lightning-input>
+                                <lightning-input label="Account Name" name="accnameRelation" type="text" onchange={handleFieldRelation} ></lightning-input>
                                 <br>
                                 <lightning-button type="submit"
                                                   name="submit"
@@ -102,12 +97,23 @@
                                 </lightning-record-edit-form>                                                             
                             </div>
                             <div class ="slds-m-around_medium">
-                            <lightning-datatable key-field="Id" columns={columnList} hide-checkbox-column="False" show-row-number-column="true">
-                            </lightning-datatable>
+                                <div if:true={searchRelationData}>
+                                    <lightning-datatable data={searchRelationData} 
+                                                         columns={columnRelation} 
+                                                         key-field="id"
+                                                         hide-checkbox-column="true">
+                                    </lightning-datatable>
+                                <!--data table of Account closed-->
+                                <!--<template if:true={norecordfound}>
+                                --No Payments found--
+                                
+                    
+                                 </template>-->
+                                </div>
                             </div>
                    
             
-                    </div>
+                   <!--</div>--> 
                     
                 </lightning-tab>
             </lightning-tabset>

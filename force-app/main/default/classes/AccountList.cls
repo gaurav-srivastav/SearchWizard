@@ -1,10 +1,4 @@
 public with sharing class AccountList {
-    // @AuraEnabled (cacheable = true)
-    // public static List<Account> searchAccount (String accList){
-    //     string straccName = '%'+ accList + '%';
-    //     return [Select Id, Name from Account WHERE Name LIKE: straccName ];
-    // }
-    //public List<Account> accAddress {get;set;}
     @AuraEnabled(Cacheable = true)
         public static list<Account> searchAccount(String strAccName ,String strAccEmail, String strAccRecord ,String strExtId, String strBusiness,String strPersonal)  {
             strAccName = '%' + strAccName + '%';
@@ -54,9 +48,6 @@ public with sharing class AccountList {
         else if(strAddHCP != null){
             accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddHCP];
         }
-        else if(strAddHCP != null){
-            accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddHCP];
-        }
         else if(strAddHCO != null){
             accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddHCO];
         }
@@ -64,6 +55,59 @@ public with sharing class AccountList {
         return accAddress;
         //= Database.query(pSOQL);
     }
+
+
+    @AuraEnabled (Cacheable = true)
+    public static list<DataRelationAccount> searchRelation(String strAccNameRel){
+        strAccNameRel = '%' +strAccNameRel+ '%';
+        List<Account> accRelation = new  list<Account>();       
+                accRelation =[SELECT  Id, Name, Phone, RecordType.Name, Parent_Account__r.Id,Parent_Account__r.name,Parent_Account__r.RecordType.Name, Customer_Email__c From Account WHERE Name LIKE :strAccNameRel];
+                List<DataRelationAccount> response = new List<DataRelationAccount>();
+                for(Account acc : accRelation){
+                    DataRelationAccount obj = new DataRelationAccount();
+                    obj.accId = acc.Id;
+                    obj.name = acc.Name;
+                    obj.recordType = acc.RecordType.Name;
+                    obj.nameUrl = '/'+acc.Id;
+                    obj.parenturlName='/'+acc.Parent_Account__r.Id;
+                    obj.parentAccName = acc.Parent_Account__r.name;
+                    obj.parentRecordType = acc.Parent_Account__r.RecordType.Name;
+                    obj.emailAccount = acc.Customer_Email__c;
+                    response.add(obj);
+                }
+                return response;
+        
+
+        
+    }
+
+
+
+    public class DataRelationAccount{
+        @AuraEnabled
+        public Id accId {get;set;} 
+        @AuraEnabled
+        public String name {get;set;}
+        @AuraEnabled
+        public String nameUrl {get;set;}
+        @AuraEnabled
+        public String parentAccName {get;set;}
+        @AuraEnabled
+        public String parenturlName {get;set;}
+        @AuraEnabled
+        public String parentRecordType{get;set;}       
+        @AuraEnabled
+        public String emailAccount {get;set;}
+        @AuraEnabled
+        public String recordType {get;set;}
+            
+        }
+    
+
 }
+
+
+
+
 
 

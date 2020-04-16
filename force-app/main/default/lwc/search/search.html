@@ -47,11 +47,17 @@
                         <lightning-record-edit-form>
                         
                             <lightning-input label="Account Name" name="accnameAddress" type="text" onchange={handleFieldAdd}></lightning-input>
+                            <lightning-input label="External Id" name="accnExternalId" type="text" onchange={handleFieldAdd}></lightning-input>
                             <lightning-input label="Brick" name="addressBrick" type="text" onchange={handleFieldAdd}></lightning-input>
-                            <lightning-input label="Zip" name="addressZip" type="number" onchange={handleFieldAdd}></lightning-input>
+                            <lightning-input label="Zip" name="addressZip" type="text" onchange={handleFieldAdd}></lightning-input>
                             <lightning-input label="Country" name="addressCountry" type="text" onchange={handleFieldAdd}></lightning-input>
-                             <lightning-input type="checkbox" name="addressHCP" label="HCP Address" onchange={handleFieldAdd}></lightning-input>
-                             <lightning-input type="checkbox" name="addressHCO" label="HCO Address" onchange={handleFieldAdd}></lightning-input>
+                            <!-- <lightning-checkbox-group name="Checkbox Group"
+                            label="Record Type"
+                            options={options}
+                            value={value}
+                            onchange={handleFieldAdd}></lightning-checkbox-group> -->
+                             <lightning-input type="checkbox" name="Bike" label="HCP Address" onchange={handleFieldAdd} value="HCP"></lightning-input>
+                             <lightning-input type="checkbox" name="Car" label="HCO Address" onchange={handleFieldAdd} value="HCO"></lightning-input>
                             <br>
                             <lightning-button type="submit"
                                               name="submit"
@@ -88,6 +94,13 @@
                             <lightning-record-edit-form>
                                 
                                 <lightning-input label="Account Name" name="accnameRelation" type="text" onchange={handleFieldRelation} ></lightning-input>
+                                <lightning-combobox
+                                name="realtionship"
+                                label="Relationship"
+                                value={value}
+                                placeholder="Select Relation"
+                                options={options}
+                                onchange={handleFieldRelation}  required></lightning-combobox>
                                 <br>
                                 <lightning-button type="submit"
                                                   name="submit"

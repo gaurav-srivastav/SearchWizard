@@ -8,7 +8,7 @@ const columns = [
     {label: 'Id', fieldName: 'Id'},
     {label: 'Name', fieldName: 'Name'},
     //,type: 'url',typeAttributes: {label:{fieldName:'Name'},target:'_blank'}},
-    {label: 'Record Type', fieldName: 'RecordType.Name'},
+    {label: 'Record Type', fieldName: 'RecordType.name'},
     {label: 'Description', fieldName: 'Description'},
     {label: 'Account Number', fieldName: 'AccountNumber'},
     {label:'Email Id', fieldName:'Customer_Email__c'},
@@ -27,18 +27,20 @@ const columnAdd =[
 const columnRelation=[
     {label: 'ID', fieldName: 'nameUrl',
     type: 'url',typeAttributes: {label:{fieldName:'accId'},target:'_blank'}},
-    {label:'Name',fieldName:'name'},
-    {label:'Record Type',fieldName:'recordType'},
+    {label:'Relation Name',fieldName:'name'},
+    //{label:'Record Type',fieldName:'recordType'},
     //{label:'Account Name',fieldName:'Name' parenturlName},
     {label:'Parent Account',fieldName:'parenturlName',
     type: 'url',typeAttributes: {label:{fieldName:'parentAccName'},target:'_blank'}},
     {label:'Parent Record Type',fieldName:'parentRecordType'},
-    {label:'Child Account',fieldName:'Child_account__c.name'},
-    {label:'Email',fieldName:'emailAccount'}
+    {label:'Child Account',fieldName:'childurlName',
+    type: 'url',typeAttributes: {label:{fieldName:'childAccName'},target:'_blank'}},
+    {label:'Child Record Type',fieldName:'childRecordType'},
 ];
                    
 export default class Search extends LightningElement {
     //Account Details
+    @track errorAccount;
     @track searchData;
     @track columns = columns;
     @track errorMsg = '';
@@ -48,17 +50,19 @@ export default class Search extends LightningElement {
     strSearchAccEmail = '';
     strSearchAccRecordType = '';
     strExternalId = '';
-    strBusinessAcc = true;
-    strPersonalAcc = true;
+    strBusinessAcc=false;
+    strPersonalAcc=false;
     //Address
     @track searchAddData;
     @track columnAdd = columnAdd;
     strAddAccName = '';
+    strExternalIdAdd = '';
     strAddAccBrick = '';
     strAddAccZip = '';
     strAddAccCountry = '';
-    strAddAccHCP = true;
-    strAddAccHCO = true;
+    strAddAccHCP=false;
+    strAddAccHCO=false;
+    //@track value =['option1'];
     //relation data
     @track searchRelationData;
     @track columnRelation = columnRelation;
@@ -66,22 +70,44 @@ export default class Search extends LightningElement {
 
     //Account Event Handler
     handleField(event) {
-        this.strSearchAccName = event.detail.value;
-        this.strSearchAccEmail = event.detail.value;
-        this.strSearchAccRecordType = event.detail.value;
-        this.strExternalId = event.detail.value;
-        this.strBusinessAcc = event.detail.value;
-        this.strPersonalAcc = event.detail.value;
+            if(event.target.name ==='AccountName'){
+            this.strSearchAccName = event.target.value;
+             /*eslint-disable no-console*/
+             console.log(this.strSearchAccName);
+            }
+            else if(event.target.name ==='email'){
+                this.strSearchAccEmail = event.target.value;
+                /*eslint-disable no-console*/
+             console.log(this.strSearchAccEmail);
+            }
+            else if(event.target.name ==='recordType'){
+                this.strSearchAccRecordType = event.target.value;
+                /*eslint-disable no-console*/
+             console.log(this.strSearchAccRecordType);
+            }
+            else if(event.target.name ==='externalId'){
+                this.strExternalId = event.target.value;
+                /*eslint-disable no-console*/
+             console.log(this.strExternalId);
+            }
+            else if(event.target.name ==='bussiness'){
+                this.strBusinessAcc = event.target.checked;
+                /*eslint-disable no-console*/
+             console.log(this.strBusinessAcc);
+            }
+            else if(event.target.name ==='personal'){
+                this.strPersonalAcc = event.target.checked;
+                /*eslint-disable no-console*/
+             console.log(this.strPersonalAcc);
+            }
         
     }
 
     displayAccount() {
-       if((!this.strSearchAccName || !this.strSearchAccEmail)||(!this.strSearchAccRecordType || !this.strExternalId)) {
-            this.errorMsg = 'Please enter account details to search.';
-            this.searchData = undefined;
-            return;
-        }      
-        if(this.strSearchAccName){
+   
+        if((this.strSearchAccName || this.strSearchAccEmail)||(this.strSearchAccRecordType || this.strExternalId)){
+            /*eslint-disable no-console*/
+            console.log(this.strSearchAccName + this.strSearchAccEmail + this.strSearchAccRecordType + this.strExternalId +this.strBusinessAcc+this.strPersonalAcc);
             searchAccount({strAccName : this.strSearchAccName,strAccEmail:this.strSearchAccEmail,
                 strAccRecord:this.strSearchAccRecordType,strExtId:this.strExternalId,
                 strBusiness:this.strBusinessAcc,strPersonal:this.strPersonalAcc})
@@ -89,30 +115,70 @@ export default class Search extends LightningElement {
                     this.searchData = result;
                     this.norecordfound = false;            
                 })
-            } else{
-                this.searchData = undefined;
-                this.norecordfound = true;
+                .catch(error=>{
+                    this.errorAccount = error;
+                      /*eslint-disable no-console*/
+                      console.log('error value',error);
+                })
+             } 
+             //else{
+            //     this.searchData = undefined;
+            //     this.norecordfound = true;
 
-            }
+            // }
     }
     //Address event Handler 
+    // get options() {
+    //     return [
+    //         { label: 'HCP Address', value: 'option1' },
+    //         { label: 'HCO Address', value: 'option2' },
+    //     ];
+    // }
 
     handleFieldAdd(event){
-        this.strAddAccName = event.detail.value;
-        this.strAddAccBrick = event.detail.value;
-        this.strAddAccZip = event.detail.value;
-        this.strAddAccCountry = event.detail.value;
-        this.strAddAccHCP = event.detail.value;
-        this.strAddAccHCO = event.detail.value;    
+        if(event.target.name ==='accnameAddress'){
+            this.strAddAccName = event.target.value;
+             /*eslint-disable no-console*/
+             console.log(this.strSearchAccName);
+            }
+            else if(event.target.name ==='accnExternalId'){
+                this.strExternalIdAdd = event.target.value;
+                /*eslint-disable no-console*/
+             console.log(this.strExternalIdAdd);
+            }
+            else if(event.target.name ==='addressBrick'){
+                this.strAddAccBrick = event.target.value;
+                /*eslint-disable no-console*/
+             console.log(this.strSearchAccEmail);
+            }
+            else if(event.target.name ==='addressZip'){
+                this.strAddAccZip = event.target.value;
+                /*eslint-disable no-console*/
+             console.log(this.strAddAccZip);
+            }
+            else if(event.target.name ==='addressCountry'){
+                this.strAddAccCountry = event.target.value;
+                /*eslint-disable no-console*/
+             console.log(this.strAddAccCountry);
+            }
+            else if(event.target.name ==='Bike'){
+                this.strAddAccHCP = event.target.checked;
+                /*eslint-disable no-console*/
+             console.log(this.strAddAccHCP);
+            }
+            else if(event.target.name ==='Car'){
+                this.strAddAccHCO = event.target.checked;
+                /*eslint-disable no-console*/
+             console.log(this.strAddAccHCO);
+            }
+
     }
-    displayAddress() {
-        if(((!this.strAddAccName || !this.strAddAccBrick)||(!this.strAddAccZip || !this.strAddAccCountry))|| ((!this.strAddAccHCP )|| (!this.strAddAccHCO))){
-            this.errorMsg = 'Please enter account details to search.';
-            this.searchAddData = undefined;
-            return;
-        }   
-        if(this.strAddAccName){
-            searchAddress({strAccAddName : this.strAddAccName,strAddBrick:this.strAddAccBrick,strAddZip:this.strAddAccZip,strAddCountry:this.strAddAccCountry,
+        
+    displayAddress() {  
+        if(this.strAddAccName || this.strExternalIdAdd || this.strAddAccBrick ||this.strAddAccZip || this.strAddAccCountry){
+            /*eslint-disable no-console*/
+            console.log(this.strAddAccName + this.strExternalIdAdd + this.strAddAccBrick + this.strAddAccZip +this.strAddAccCountry);
+            searchAddress({strAccAddName : this.strAddAccName,strExternalIdA:this.strExternalIdAdd,strAddBrick:this.strAddAccBrick,strAddZip:this.strAddAccZip,strAddCountry:this.strAddAccCountry,
             strAddHCP:this.strAddAccHCP,strAddHCO:this.strAddAccHCO})
                 .then(result => {
                     this.searchAddData = result;
@@ -125,9 +191,33 @@ export default class Search extends LightningElement {
             }
     }
 
+
+
     //Account Relaiton event Handler
+    //return combo box value using options function
+    @track relValue = '';
+
+    get options() {
+        return [
+            { label: 'Parent', value: 'parentRelation' },
+            { label: 'Child', value: 'childRelation' },
+        ];
+    }
+
+
+
     handleFieldRelation(event){
-        this.strAccNameRelation = event.detail.value;
+        if(event.target.name ==='accnameRelation'){
+            this.strAccNameRelation = event.target.value;
+             /*eslint-disable no-console*/
+             console.log(this.strAccNameRelation);
+            }
+
+        else if(event.target.name ==='realtionship'){
+                this.relValue = event.detail.value;
+                 /*eslint-disable no-console*/
+                    console.log(this.relValue);
+        }
     }
     displayRealtionship(){
         if(!this.strAccNameRelation){
@@ -136,7 +226,7 @@ export default class Search extends LightningElement {
              return;
          }
         if(this.strAccNameRelation){
-            searchRelation({strAccNameRel:this.strAccNameRelation})
+            searchRelation({strAccNameRel:this.strAccNameRelation,strAccPC_Relation:this.relValue})
             .then(result=>{
                 this.searchRelationData = result;
                 this.norecordfound = flase;

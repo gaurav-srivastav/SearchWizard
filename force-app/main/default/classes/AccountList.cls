@@ -1,87 +1,125 @@
 public with sharing class AccountList {
-    @AuraEnabled(Cacheable = true)
-        public static list<Account> searchAccount(String strAccName ,String strAccEmail, String strAccRecord ,String strExtId, String strBusiness,String strPersonal)  {
-            strAccName = '%' + strAccName + '%';
-            strAccEmail = '%' + strAccEmail + '%';
-            strAccRecord = '%' + strAccRecord + '%';
-            strExtId = '%' + strExtId + '%';
-            strBusiness = '%' + strBusiness + '%';
-            strPersonal = '%' + strPersonal + '%';
-            List<Account> lstAccs = new List<Account>();
-
-            if((strAccName != null) || (strAccEmail != null)){
-                lstAccs = [SELECT  Id, Name, Phone, RecordType.Name, Description, AccountNumber, Customer_Email__c From Account WHERE Name LIKE :strAccName OR Customer_Email__c LIKE :strAccEmail];
+    @AuraEnabled (Cacheable = true)  
+    public static list<Account> searchAccount(String strAccName ,String strAccEmail, String strAccRecord ,String strExtId, Boolean strBusiness,Boolean strPersonal)  {
+        strAccName = strAccName;
+        strAccEmail = strAccEmail;
+        strAccRecord = strAccRecord;
+        strExtId = strExtId ;
+        strBusiness = strBusiness;
+        strPersonal = strPersonal;
+        String value ='';
+        List<Account> lstAccs = new List<Account>();
+        String baseQuery = 'SELECT Id, Name, Phone, RecordType.Name, Description, AccountNumber, Customer_Email__c FROM ACCOUNT WHERE Id != null ';
+             if(strAccName != ''){
+                baseQuery += ' AND Name LIKE \''+strAccName+'%\'';              
+             }
+            if(strAccEmail != ''){
+                baseQuery += ' AND Customer_Email__c =:strAccEmail';
             }
-            else if(strAccRecord != null){
-                lstAccs = [SELECT  Id, Name, Phone, RecordType.Name, Description, AccountNumber, Customer_Email__c From Account WHERE RecordType.Name LIKE :strAccRecord];
+            if(strAccRecord != ''){
+                baseQuery += '  AND RecordType.Name =:strAccRecord';
             }
-            else if((strBusiness != null) || (strPersonal != null)){
-                lstAccs = [SELECT  Id, Name, Phone, RecordType.Name, Description, AccountNumber, Customer_Email__c, Variant__c From Account WHERE Name LIKE :strBusiness OR Variant__c LIKE :strPersonal];
+            if(strExtId != ''){
+                baseQuery += '  AND External_Id__c LIKE:strExtId';
             }
-            return lstAccs; 
+            lstAccs = Database.query(baseQuery);
+            return lstAccs;        
     }
 
     @AuraEnabled (Cacheable = true)
-    public static  list<Account> searchAddress(String strAccAddName,String strAddBrick,String strAddZip,String strAddCountry,
-    String strAddHCP, String strAddHCO){
-        strAccAddName = '%' + strAccAddName + '%';
-        strAddBrick = '%' + strAddBrick + '%';
-        strAddZip = '%' + strAddZip + '%';
-        strAddCountry = '%' + strAddCountry + '%';
-        strAddHCP = '%' + strAddHCP + '%';
-        strAddHCO = '%' + strAddHCO + '%';
+    public static  list<Account> searchAddress(String strAccAddName, String strExternalIdA,String strAddBrick,String strAddZip,String strAddCountry,
+    Boolean strAddHCP, Boolean strAddHCO){
+        strAccAddName = strAccAddName;
+        strExternalIdA = strExternalIdA;
+        strAddBrick = strAddBrick;
+        strAddZip = strAddZip;
+        strAddCountry = strAddCountry;
+        strAddHCP = strAddHCP;
+        strAddHCO = strAddHCO;
+        String Bike ='Bike';
+        String Car ='Car';
         List<Account> accAddress = new  list<Account>();
-        //String pSOQL; 
-        
-        if((strAccAddName != null)||(strAddBrick != null)){
-            accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAccAddName OR Name LIKE :strAddBrick];
+        String baseQuery= 'SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Id != null '; 
+        if(strAccAddName != ''){
+            baseQuery += ' AND Name LIKE \''+strAccAddName+'%\'';              
+         }
+        if(strExternalIdA != ''){
+            baseQuery += '  AND External_Id__c =:strExternalIdA';
         }
-        else if(strAddBrick != null){
-            accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddBrick];
+        if(strAddBrick != ''){
+            baseQuery += '  AND RecordType.Name =:strAddBrick';
         }
-        else if(strAddZip != null){
-            accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddZip];
+        if(strAddZip != ''){
+            baseQuery += '  AND External_Id__c LIKE:strAddZip';
         }
-        else if(strAddCountry != null){
-            accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddCountry];
+        if(strAddCountry != ''){
+            baseQuery += '  AND Country__c LIKE:strAddCountry';
         }
-        else if(strAddHCP != null){
-            accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddHCP];
+        if(strAddHCP == true){
+            baseQuery += '  AND RecordType.Name =:Bike';
         }
-        else if(strAddHCO != null){
-            accAddress = [SELECT  Id, Name, BillingAddress, ShippingAddress, Customer_Address__c From Account WHERE Name LIKE :strAddHCO];
+        if(strAddHCO == true){
+            baseQuery += '  AND RecordType.Name =:Car';
         }
-
+        accAddress = Database.query(baseQuery);
         return accAddress;
-        //= Database.query(pSOQL);
+         
     }
 
 
     @AuraEnabled (Cacheable = true)
-    public static list<DataRelationAccount> searchRelation(String strAccNameRel){
-        strAccNameRel = '%' +strAccNameRel+ '%';
-        List<Account> accRelation = new  list<Account>();       
-                accRelation =[SELECT  Id, Name, Phone, RecordType.Name, Parent_Account__r.Id,Parent_Account__r.name,Parent_Account__r.RecordType.Name, Customer_Email__c From Account WHERE Name LIKE :strAccNameRel];
-                List<DataRelationAccount> response = new List<DataRelationAccount>();
-                for(Account acc : accRelation){
+    public static list<DataRelationAccount> searchRelation(String strAccNameRel , String strAccPC_Relation){
+        strAccPC_Relation = strAccPC_Relation;       
+        strAccNameRel = strAccNameRel+ '%';
+        System.debug('Parent child Realtion values'+strAccPC_Relation+''+strAccNameRel);  
+        List<Relation_Object__c> accRelation = new  list<Relation_Object__c>();  
+        List<DataRelationAccount> response = new List<DataRelationAccount>();     
+        switch on strAccPC_Relation {
+            when 'parentRelation' {
+                accRelation =[SELECT  Id, Name, Parent_Account__r.Id,Parent_Account__r.name,Child_Account__r.Id,Child_Account__r.name,Child_Account__r.RecordType.Name From Relation_Object__c  WHERE Parent_Account__r.Name LIKE :strAccNameRel];
+                        
+                        for(Relation_Object__c acc : accRelation){
+                            DataRelationAccount obj = new DataRelationAccount();
+                            obj.accId = acc.Id;
+                            obj.name = acc.Name;
+                            //obj.recordType = acc.RecordType.Name;
+                            obj.nameUrl = '/'+acc.Id;
+                            //obj.parenturlName='/'+acc.Parent_Account__r.Id;
+                            //obj.parentAccName = acc.Parent_Account__r.name;
+                            //obj.parentRecordType = acc.Parent_Account__r.RecordType.Name;
+                            obj.childurlName='/'+acc.Child_Account__r.Id;
+                            obj.childAccName = acc.Child_Account__r.name;                   
+                            obj.childRecordType = acc.Child_Account__r.RecordType.Name;
+                            response.add(obj);
+                
+            }
+        }
+            when 'childRelation'{
+                accRelation =[SELECT  Id, Name, Parent_Account__r.Id,Parent_Account__r.name,Parent_Account__r.RecordType.Name,Child_Account__r.Id,Child_Account__r.name From Relation_Object__c  WHERE Parent_Account__r.Name LIKE :strAccNameRel];
+                for(Relation_Object__c acc : accRelation){
                     DataRelationAccount obj = new DataRelationAccount();
                     obj.accId = acc.Id;
                     obj.name = acc.Name;
-                    obj.recordType = acc.RecordType.Name;
+                    //obj.recordType = acc.RecordType.Name;
                     obj.nameUrl = '/'+acc.Id;
                     obj.parenturlName='/'+acc.Parent_Account__r.Id;
                     obj.parentAccName = acc.Parent_Account__r.name;
                     obj.parentRecordType = acc.Parent_Account__r.RecordType.Name;
-                    obj.emailAccount = acc.Customer_Email__c;
+                   // obj.childurlName='/'+acc.Child_Account__r.Id;
+                    //obj.childAccName = acc.Child_Account__r.name;                   
+                    //obj.childRecordType = acc.Child_Account__r.RecordType.Name;
                     response.add(obj);
-                }
-                return response;
-        
-
+                
+            }
+        }
+            when else{
+                System.debug('no match found');
+            }
+           
+        }
+        return response;
         
     }
-
-
 
     public class DataRelationAccount{
         @AuraEnabled
@@ -97,9 +135,13 @@ public with sharing class AccountList {
         @AuraEnabled
         public String parentRecordType{get;set;}       
         @AuraEnabled
-        public String emailAccount {get;set;}
+        public String childAccName {get;set;}
         @AuraEnabled
         public String recordType {get;set;}
+        @AuraEnabled
+        public String childRecordType {get;set;}
+        @AuraEnabled
+        public String childurlName {get;set;}
             
         }
     
